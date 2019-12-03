@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Base64;
 import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -213,6 +214,18 @@ public class Bridge {
         this.registerAllPlugins();
 
         this.loadWebView();
+    }
+
+    protected static void inject(WebView webView, JSInjector injector) {
+        String inject = injector.getScriptString();
+
+        String encoded = Base64.encodeToString(inject.getBytes(), Base64.NO_WRAP);
+        webView.loadUrl("javascript:(function() {" +
+          "console.log('INJECTING CAPACITOR');" +
+          "if (!window.Capacitor || !window.Capacitor.isNative) {" +
+          "  eval(window.atob('" + encoded + "'));" +
+          "}" +
+          "})()");
     }
 
     private void setAllowedOriginRules() {
@@ -947,7 +960,7 @@ public class Bridge {
      * Build the JSInjector that will be used to inject JS into files served to the app,
      * to ensure that Capacitor's JS and the JS for all the plugins is loaded each time.
      */
-    private JSInjector getJSInjector() {
+    JSInjector getJSInjector() {
         try {
             String globalJS = JSExport.getGlobalJS(context, config.isLoggingEnabled(), isDevMode());
             String bridgeJS = JSExport.getBridgeJS(context);

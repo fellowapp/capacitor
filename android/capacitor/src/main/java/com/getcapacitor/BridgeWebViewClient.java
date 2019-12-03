@@ -66,6 +66,7 @@ public class BridgeWebViewClient extends WebViewClient {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         super.onPageStarted(view, url, favicon);
+        Bridge.inject(view, bridge.getJSInjector());
         bridge.reset();
         List<WebViewListener> webViewListeners = bridge.getWebViewListeners();
 
@@ -74,6 +75,14 @@ public class BridgeWebViewClient extends WebViewClient {
                 listener.onPageStarted(view);
             }
         }
+    }
+
+    @Override
+    public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
+        if (isReload) {
+            Bridge.inject(view, bridge.getJSInjector());
+        }
+        super.doUpdateVisitedHistory(view, url, isReload);
     }
 
     @Override
