@@ -208,6 +208,9 @@ public class WebViewLocalServer {
     }
 
     private boolean isMainUrl(Uri loadingUrl) {
+        if (loadingUrl.getHost().compareToIgnoreCase("localhost") == 0) {
+            return true;
+        }
         return (bridge.getServerUrl() == null && loadingUrl.getHost().equalsIgnoreCase(bridge.getHost()));
     }
 
