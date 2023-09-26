@@ -206,7 +206,10 @@ public class CapacitorCookieManager extends CookieManager {
                     setCookie(uri.toString(), headerValue);
 
                     // Set at the defined domain in the response or at default capacitor hosted url
-                    setCookie(getDomainFromCookieString(headerValue), headerValue);
+                    // Since fellow cookies don't get sent with a domain this code ends up pulling in the default domain
+                    // from the capacitor.config.json, which means if someone sets a cookie on a subdomain it'll also
+                    // get set on the main domain, which is not what we want and breaks our login
+                    // setCookie(getDomainFromCookieString(headerValue), headerValue);
                 } catch (Exception ignored) {}
             }
         }
